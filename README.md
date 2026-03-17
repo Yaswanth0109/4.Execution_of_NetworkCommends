@@ -25,8 +25,62 @@ This commands includes
 <BR>
 • Other IP Commands e.g. show ip route etc.
 <BR>
+## Program
+# server
+```
+import socket
+import subprocess
+import platform
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = "127.0.0.1"
+port = 6000
+server.bind((host, port))
+server.listen(1)
+print("Server started... Waiting for connection...")
+conn, addr = server.accept()
+print("Connected to:", addr)
+while True:
+    command = conn.recv(1024).decode()
+    if command.lower() == "exit":
+        print("Client disconnected.")
+        break
+    print("Command received:", command)
+    try:
+        output = subprocess.check_output(command, shell=True)
+        conn.send(output)
+    except Exception as e:
+        conn.send(str(e).encode())
+conn.close()
+server.close()
+```
+# client
+```
+import socket
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = "127.0.0.1"
+port = 6000
+client.connect((host, port))
+print("Connected to Server")
+print("You can use commands like: ping google.com, ipconfig, netstat, nslookup google.com")
+print("Type 'exit' to quit")
+while True:
+    command = input("\nEnter Network Command: ")
+    client.send(command.encode())
+    if command.lower() == "exit":
+        break
+    output = client.recv(4096).decode()
+    print("\n--- Command Output ---")
+    print(output)
+client.close()
+```
 
 ## Output
+CLIENT:
+<img width="889" height="555" alt="image" src="https://github.com/user-attachments/assets/d9b56141-e46a-4ac8-a79d-b5a7a0ea48dd" />
+SERVER:
+<img width="798" height="290" alt="image" src="https://github.com/user-attachments/assets/7281813f-e13a-4617-9973-c33ac0ce56d2" />
+
+
 
 ## Result
 Thus Execution of Network commands Performed 
